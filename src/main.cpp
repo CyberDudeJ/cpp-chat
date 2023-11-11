@@ -1,52 +1,82 @@
-// Copyright 2021 Arthur Sonzogni. All rights reserved.
+// Copyright 2022 Arthur Sonzogni. All rights reserved.
 // Use of this source code is governed by the MIT license that can be found in
-// the LICENSED file.
-#include <cmath>                   // for sin, cos
-#include <ftxui/dom/elements.hpp>  // for canvas, Element, separator, hbox, operator|, border
-#include <ftxui/screen/screen.hpp>  // for Pixel
-#include <memory>   // for allocator, shared_ptr, __shared_ptr_access
-#include <string>   // for string, basic_string
-#include <utility>  // for move
-#include <vector>   // for vector, __alloc_traits<>::value_type
-
-#include "ftxui/component/component.hpp"  // for Renderer, CatchEvent, Horizontal, Menu, Tab
-#include "ftxui/component/component_base.hpp"      // for ComponentBase
-#include "ftxui/component/event.hpp"               // for Event
-#include "ftxui/component/mouse.hpp"               // for Mouse
-#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
-
-int main() {
-  using namespace ftxui;
+// the LICENSE file.
+#include <ftxui/component/component_options.hpp>  // for ButtonOption
+#include <ftxui/component/mouse.hpp>              // for ftxui
+#include <functional>                             // for function
+#include <memory>                                 // for allocator, shared_ptr
  
-  int selected_tab = 1;
-  auto tab = Container::Tab(
-      {
-          test,
-      },
-      &selected_tab);
-
-  std::vector<std::string> tab_titles = {
-      "test",
-  };
-  auto tab_toggle = Menu(&tab_titles, &selected_tab);
-
-  auto component = Container::Horizontal({
-      tab_with_mouse,
-      tab_toggle,
+#include "ftxui/component/component.hpp"  // for Button, operator|=, Renderer, Vertical, Modal
+#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive, Component
+#include "ftxui/dom/elements.hpp"  // for operator|, separator, text, size, Element, vbox, border, GREATER_THAN, WIDTH, center, HEIGHT
+ 
+using namespace ftxui;
+ 
+auto button_style = ButtonOption::Animated();
+ 
+// Definition of the main component. The details are not important.
+Component MainComponent(std::function<void()> show_modal,
+                        std::function<void()> exit) {
+  auto component = Container::Vertical({
+      Button("Show modal", show_modal, button_style),
+      Button("Quit", exit, button_style),
   });
-
-  // Add some separator to decorate the whole component:
-  auto component_renderer = Renderer(component, [&] {
-    return hbox({
-               tab_with_mouse->Render(),
+  // Polish how the two buttons are rendered:
+  component |= Renderer([&](Element inner) {
+    return vbox({
+               text("Main component"),
                separator(),
-               tab_toggle->Render(),
-           }) |
-           border;
+               inner,
+           })                                //
+           | size(WIDTH, GREATER_THAN, 15)   //
+           | size(HEIGHT, GREATER_THAN, 15)  //
+           | border                          //
+           | center;                         //
   });
-
-  auto screen = ScreenInteractive::FitComponent();
-  screen.Loop(component_renderer);
-
+  return component;
+}
+ 
+// Definition of the modal component. The details are not important.
+Component ModalComponent(std::function<void()> do_nothing,
+                         std::function<void()> hide_modal) {
+  auto component = Container::Vertical({
+      Button("Do nothing", do_nothing, button_style),
+      Button("Quit modal", hide_modal, button_style),
+  });
+  // Polish how the two buttons are rendered:
+  component |= Renderer([&](Element inner) {
+    return vbox({
+               text("Modal component "),
+               separator(),
+               inner,
+           })                               //
+           | size(WIDTH, GREATER_THAN, 30)  //
+           | border;                        //
+  });
+  return component;
+}
+ 
+int main(int argc, const char* argv[]) {
+  auto screen = ScreenInteractive::TerminalOutput();
+ 
+  // State of the application:
+  bool modal_shown = false;
+ 
+  // Some actions modifying the state:
+  auto show_modal = [&] { modal_shown = true; };
+  auto hide_modal = [&] { modal_shown = false; };
+  auto exit = screen.ExitLoopClosure();
+  auto do_nothing = [&] {};
+ 
+  // Instanciate the main and modal components:
+  auto main_component = MainComponent(show_modal, exit);
+  auto modal_component = ModalComponent(do_nothing, hide_modal);
+ 
+  // Use the `Modal` function to use together the main component and its modal
+  // window. The |modal_shown| boolean controls whether the modal is shown or
+  // not.
+  main_component |= Modal(modal_component, &modal_shown);
+ 
+  screen.Loop(main_component);
   return 0;
 }
