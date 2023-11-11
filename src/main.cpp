@@ -3,13 +3,9 @@
 #include <iostream>
 
 int main(){
-  const std::string hello {"Hello"},
-        world {"World"},
-        myftxui {"FTXUI"};
-
   ftxui::Element doc = ftxui::hbox(
-    ftxui::text( abi ) | ftxui::border,
-    ftxui::text( stinky ) | ftxui::border,
+    ftxui::text( "abi" ) | ftxui::border,
+    ftxui::text( "stinky" ) | ftxui::border,
   );
   ftxui::Screen screen = ftxui::Screen::Create(
     ftxui::Dimension::Full(),
