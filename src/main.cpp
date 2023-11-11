@@ -1,48 +1,52 @@
-#include <memory>  // for allocator, __shared_ptr_access
-#include <string>  // for char_traits, operator+, string, basic_string
- 
-#include "ftxui/component/captured_mouse.hpp"  // for ftxui
-#include "ftxui/component/component.hpp"       // for Input, Renderer, Vertical
-#include "ftxui/component/component_base.hpp"  // for ComponentBase
-#include "ftxui/component/component_options.hpp"  // for InputOption
-#include "ftxui/component/screen_interactive.hpp"  // for Component, ScreenInteractive
-#include "ftxui/dom/elements.hpp"  // for text, hbox, separator, Element, operator|, vbox, border
-#include "ftxui/util/ref.hpp"  // for Ref
- 
+// Copyright 2021 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSED file.
+#include <cmath>                   // for sin, cos
+#include <ftxui/dom/elements.hpp>  // for canvas, Element, separator, hbox, operator|, border
+#include <ftxui/screen/screen.hpp>  // for Pixel
+#include <memory>   // for allocator, shared_ptr, __shared_ptr_access
+#include <string>   // for string, basic_string
+#include <utility>  // for move
+#include <vector>   // for vector, __alloc_traits<>::value_type
+
+#include "ftxui/component/component.hpp"  // for Renderer, CatchEvent, Horizontal, Menu, Tab
+#include "ftxui/component/component_base.hpp"      // for ComponentBase
+#include "ftxui/component/event.hpp"               // for Event
+#include "ftxui/component/mouse.hpp"               // for Mouse
+#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
+
 int main() {
   using namespace ftxui;
  
-  // The data:
-  std::string username;
-  std::string password;
- 
-  // The basic input components:
-  Component input_username = Input(&username, "username"); 
-  // The password input component:
-  InputOption password_option;
-  password_option.password = true;
-  Component input_password = Input(&password, "password", password_option);
- 
-  // The phone number input component:
-  // We are using `CatchEvent` to filter out non-digit characters.
- 
-  // The component tree:
-  auto component = Container::Vertical({
-      input_username,
-      input_password,
-});
- 
-  // Tweak how the component tree is rendered:
-  auto renderer = Renderer(component, [&] {
-    return vbox({
-               hbox(text(" Username: "), input_username->Render()),
-               hbox(text(" Password: "), input_password->Render()),
+  int selected_tab = 1;
+  auto tab = Container::Tab(
+      {
+          test,
+      },
+      &selected_tab);
+
+  std::vector<std::string> tab_titles = {
+      "test",
+  };
+  auto tab_toggle = Menu(&tab_titles, &selected_tab);
+
+  auto component = Container::Horizontal({
+      tab_with_mouse,
+      tab_toggle,
+  });
+
+  // Add some separator to decorate the whole component:
+  auto component_renderer = Renderer(component, [&] {
+    return hbox({
+               tab_with_mouse->Render(),
                separator(),
-               text("Hello " + username + "!"),
+               tab_toggle->Render(),
            }) |
            border;
   });
- 
-  auto screen = ScreenInteractive::TerminalOutput();
-  screen.Loop(renderer);
+
+  auto screen = ScreenInteractive::FitComponent();
+  screen.Loop(component_renderer);
+
+  return 0;
 }
