@@ -17,15 +17,15 @@ endif()
 
 # ------------------------------------------------------------------------------
 
-project(ftxui-starter
+project(cpp-chat
   LANGUAGES CXX
   VERSION 1.0.0
 )
 
-add_executable(ftxui-starter src/main.cpp)
-target_include_directories(ftxui-starter PRIVATE src)
+add_executable(cpp-chat src/main.cpp)
+target_include_directories(cpp-chat PRIVATE src)
 
-target_link_libraries(ftxui-starter
+target_link_libraries(cpp-chat
   PRIVATE ftxui::screen
   PRIVATE ftxui::dom
   PRIVATE ftxui::component # Not needed for this example.
