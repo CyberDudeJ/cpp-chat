@@ -35,7 +35,7 @@ int main() {
   // Tweak how the component tree is rendered:
   auto renderer = Renderer(component, [&] {
     return vbox({
-               hbox(text(" Username: "), input_first_name->Render()),
+               hbox(text(" Username: "), input_username->Render()),
                hbox(text(" Password: "), input_password->Render()),
                separator(),
                text("Hello " + username + "!"),
