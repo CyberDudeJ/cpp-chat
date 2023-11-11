@@ -1,39 +1,24 @@
+#include <ftxui/dom/elements.hpp>
+#include <ftxui/screen/screen.hpp>
 #include <iostream>
 
-#include "ftxui/dom/elements.hpp"
-#include "ftxui/screen/screen.hpp"
-#include "ftxui/screen/string.hpp"
+int main(){
+  const std::string hello {"Hello"},
+        world {"World"},
+        myftxui {"FTXUI"};
 
-int main(void) {
-  using namespace ftxui;
+  ftxui::Element doc = ftxui::hbox(
+    ftxui::text( hello ) | ftxui::border,
+    ftxui::text( world ) | ftxui::border,
+    ftxui::text( myftxui ) | ftxui::border
+  );
+  ftxui::Screen screen = ftxui::Screen::Create(
+    ftxui::Dimension::Full(),
+    ftxui::Dimension::Fit(doc)
+  );
 
-  auto summary = [&] {
-    auto content = vbox({
-        hbox({text(L"- done:   "), text(L"3") | bold}) | color(Color::Green),
-        hbox({text(L"- active: "), text(L"2") | bold}) | color(Color::RedLight),
-        hbox({text(L"- queue:  "), text(L"9") | bold}) | color(Color::Red),
-    });
-    return window(text(L" Summary "), content);
-  };
-
-  auto document =  //
-      vbox({
-          hbox({
-              summary(),
-              summary(),
-              summary() | flex,
-          }),
-          summary(),
-          summary(),
-      });
-
-  // Limit the size of the document to 80 char.
-  document = document | size(WIDTH, LESS_THAN, 80);
-
-  auto screen = Screen::Create(Dimension::Full(), Dimension::Fit(document));
-  Render(screen, document);
-
-  std::cout << screen.ToString() << '\0' << std::endl;
-
-  return EXIT_SUCCESS;
+  ftxui::Render(screen, doc);
+  screen.Print();
+  std::cout << '\n';
+  return 0;
 }
