@@ -8,9 +8,8 @@ int main(){
         myftxui {"FTXUI"};
 
   ftxui::Element doc = ftxui::hbox(
-    ftxui::text( hello ) | ftxui::border,
-    ftxui::text( world ) | ftxui::border,
-    ftxui::text( myftxui ) | ftxui::border
+    ftxui::text( abi ) | ftxui::border,
+    ftxui::text( stinky ) | ftxui::border,
   );
   ftxui::Screen screen = ftxui::Screen::Create(
     ftxui::Dimension::Full(),
