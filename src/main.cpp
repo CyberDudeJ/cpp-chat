@@ -18,7 +18,7 @@ auto button_style = ButtonOption::Animated();
 Component MainComponent(std::function<void()> show_modal,
                         std::function<void()> exit) {
   auto component = Container::Vertical({
-      Button("Show modal", show_modal, button_style),
+      Button("Idk what this is lol image idk hhahahahahahhahahhhaahahahahahahahaah", show_modal, button_style),
       Button("Quit", exit, button_style),
   });
   // Polish how the two buttons are rendered:
@@ -40,7 +40,7 @@ Component MainComponent(std::function<void()> show_modal,
 Component ModalComponent(std::function<void()> do_nothing,
                          std::function<void()> hide_modal) {
   auto component = Container::Vertical({
-      Button("Do nothing", do_nothing, button_style),
+      Button("eeeee", do_nothing, button_style),
       Button("Quit modal", hide_modal, button_style),
   });
   // Polish how the two buttons are rendered:
